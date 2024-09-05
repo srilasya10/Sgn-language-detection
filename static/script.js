@@ -1,97 +1,119 @@
-// Ensure TensorFlow.js and Handpose model are loaded
-if (typeof tf === 'undefined' || typeof handpose === 'undefined') {
-    alert('TensorFlow.js or Handpose model is not loaded. Please check the library scripts.');
-} else {
-    const startBtn = document.getElementById('start-btn');
-    const videoElement = document.getElementById('video');
-    const predictedCharacterElement = document.getElementById('predicted-character');
+const demosSection = document.getElementById("demos");
+const enableWebcamButton = document.getElementById("webcamButton");
+let webcamRunning = false;
 
-    let modelLoaded = false;
-    let handposeModel;
-    
-    // Initialize TensorFlow.js Handpose model and camera
-    async function setup() {
-        handposeModel = await handpose.load();
-        modelLoaded = true;
+const videoElement = document.getElementById("webcam");
+const canvasElement = document.getElementById("output_canvas");
+const canvasCtx = canvasElement.getContext("2d");
+const predictionElement = document.getElementById("prediction");
 
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        videoElement.srcObject = stream;
-        videoElement.play();
+const hands = new Hands({
+    locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+    }
+});
 
-        videoElement.addEventListener('loadeddata', () => {
-            detectHands();
-        });
+hands.setOptions({
+    maxNumHands: 1, // Process up to 2 hands
+    modelComplexity: 1, // Adjust this based on performance requirements
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5
+});
+
+// Called whenever landmarks are detected
+hands.onResults(onResults);
+
+async function onResults(results) {
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+    if (results.multiHandLandmarks) {
+        for (const landmarks of results.multiHandLandmarks) {
+            // Draw hand landmarks on canvas for visualization
+            drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
+                color: "#00FF00",
+                lineWidth: 5
+            });
+            drawLandmarks(canvasCtx, landmarks, {
+                color: "#FF0000",
+                lineWidth: 2
+            });
+
+            // Normalize landmarks: scale coordinates between 0 and 1
+            // const normalizedLandmarks = landmarks.map(({ x, y }) => ({
+            //     x: x / videoElement.videoWidth,
+            //     y: y / videoElement.videoHeight
+            // }));
+
+            // Flatten normalized landmarks into an array of x, y values
+            // const xyLandmarks = normalizedLandmarks.flatMap(({ x, y }) => [x, y]);
+            const xyLandmarks = landmarks.flatMap(({ x, y }) => [x, y]);
+
+            // Send normalized landmarks to the backend for real-time prediction
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ landmarks: xyLandmarks })
+            });
+
+            // Get prediction from backend and display
+            const prediction = await response.json();
+            predictionElement.innerText = prediction.prediction || "No prediction";
+        }
+    } else {
+        predictionElement.innerText = "No hand detected"; // Handle case with no hand detection
     }
 
-    async function onResults(predictions) {
-        if (predictions.length > 0) {
-            const landmarks = predictions[0].landmarks;
-            const x = landmarks.map(landmark => landmark[0]);
-            const y = landmarks.map(landmark => landmark[1]);
-
-            const minX = Math.min(...x);
-            const minY = Math.min(...y);
-
-            const normalizedLandmarks = landmarks.flatMap(landmark => [landmark[0] - minX, landmark[1] - minY]);
-
-            if (normalizedLandmarks.length === 42) {
-                try {
-                    const response = await fetch('/predict', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ landmarks: normalizedLandmarks })
-                    });
-
-                    const data = await response.json();
-                    if (data.error) {
-                        throw new Error(data.error);
-                    }
-
-                    predictedCharacterElement.textContent = data.prediction;
-                } catch (error) {
-                    console.error('Error fetching prediction:', error);
-                    predictedCharacterElement.textContent = 'Error';
-                }
-            } else {
-                console.error('Unexpected number of features:', normalizedLandmarks.length);
-            }
-        }
-    }
-
-    async function detectHands() {
-        if (modelLoaded) {
-            const predictions = await handposeModel.estimateHands(videoElement, { flipHorizontal: true });
-            onResults(predictions);
-            requestAnimationFrame(detectHands);
-        }
-    }
-
-    startBtn.addEventListener('click', async () => {
-        if (!modelLoaded) {
-            await setup();
-        }
-    });
+    canvasCtx.restore();
 }
 
+// Check if browser supports webcam access
+function hasGetUserMedia() {
+    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+}
 
-// Draw the landmarks on the video feed for debugging
-function drawLandmarks(predictions) {
-    const ctx = videoElement.getContext('2d');
-    ctx.clearRect(0, 0, videoElement.width, videoElement.height);
+if (hasGetUserMedia()) {
+    enableWebcamButton.addEventListener("click", enableCam);
+} else {
+    console.warn("getUserMedia() is not supported by your browser");
+}
 
-    predictions.forEach(prediction => {
-        const landmarks = prediction.landmarks;
+function enableCam() {
+    if (!webcamRunning) {
+        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+            videoElement.srcObject = stream;
+            videoElement.addEventListener("loadeddata", () => {
+                webcamRunning = true;
+                enableWebcamButton.querySelector('.mdc-button__label').innerText = "DISABLE WEBCAM";
+                startDetection();
+            });
+        });
+    } else {
+        webcamRunning = false;
+        enableWebcamButton.querySelector('.mdc-button__label').innerText = "ENABLE WEBCAM";
+        const stream = videoElement.srcObject;
+        const tracks = stream.getTracks();
 
-        for (let i = 0; i < landmarks.length; i++) {
-            const x = landmarks[i][0];
-            const y = landmarks[i][1];
+        tracks.forEach((track) => track.stop()); // Stop the webcam
 
-            ctx.beginPath();
-            ctx.arc(x, y, 5, 0, 2 * Math.PI);
-            ctx.fillStyle = "red";
-            ctx.fill();
+        videoElement.srcObject = null;
+    }
+}
+
+// Start processing video frames
+function startDetection() {
+    canvasElement.width = videoElement.videoWidth;
+    canvasElement.height = videoElement.videoHeight;
+
+    async function processVideoFrame() {
+        if (webcamRunning) {
+            await hands.send({ image: videoElement });
+            requestAnimationFrame(processVideoFrame); // Continue processing frames
         }
-    });
+    }
+
+    processVideoFrame();
 }

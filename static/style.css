@@ -1,69 +1,151 @@
-* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-}
-
 body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(60deg, #000000, #232526, #414345);
-    background-size: 300% 300%;
-    animation: gradientShift 10s ease infinite;
+    padding: 0;
+    background: linear-gradient(to right, #6dd5ed, #2193b0);
     color: #fff;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-}
-
-.container {
-    display: flex;
     flex-direction: column;
-    text-align: center;
+    align-items: center;
+    min-height: 100vh;
+    justify-content: space-between;
 }
 
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+header {
+    text-align: center;
+    padding: 20px 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    width: 100%;
 }
 
 h1 {
-    margin-bottom: 20px;
-}
-
-#video {
-    border: 2px solid #fff;
-    margin-bottom: 20px;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-}
-
-#start-btn {
-    background-color:rgb(87, 82, 82);
     color: #fff;
-    border: none;
-    padding: 8px 8px;
-    height: 40px;
-    width: 50%;
-    font-size: 16px;
-    margin-left: 10rem;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20px;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    font-size: 2.5em;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
 }
 
-#start-btn:hover {
-    background-color: #333;
-    transform: scale(1.1);
+#liveView {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+    width: 100%;
+}
+
+#videoContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 40px;
+}
+
+#webcam {
+    width: 640px;
+    height: 480px;
+    border: 3px solid #fff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+}
+
+.output_canvas {
+    width: 640px;
+    height: 480px;
+    border: 3px solid #fff;
+    border-radius: 12px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.image-container-left, .image-container-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.image-container-left img, .image-container-right img {
+    width: 180px;  /* Increase image width */
+    height: 180px; /* Increase image height */
+    margin: 10px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+figure {
+    text-align: center;
+    margin: 0;
+}
+
+figcaption {
+    margin-top: 8px;
+    font-size: 1.2em;
+    color: #fff;
+    font-weight: bold;
+}
+
+#webcamButton {
+    margin-bottom: 20px;
+    background-color: #fff !important;
+    color: #2193b0 !important;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#prediction-container {
+    margin-top: 40px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+#prediction-container h3 {
+    font-size: 1.5em;
+    color: #fff;
 }
 
 #prediction {
-    margin-top: 20px;
-    font-size: 18px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #00FF00;
 }
 
+footer {
+    padding: 20px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.2);
+    width: 100%;
+    color: #fff;
+    font-size: 0.9em;
+}
+
+footer p {
+    margin: 0;
+}
+#webcamButton {
+    display: block;
+    margin: 20px auto;
+    background-color: #2193b0;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#webcamButton:hover {
+    background-color: #6dd5ed;
+}

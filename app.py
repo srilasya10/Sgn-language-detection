@@ -33,7 +33,7 @@ def predict():
         data = np.asarray(data).reshape(1, -1)
 
         # Log the incoming data for debugging
-        print("Incoming data shape:", data.shape)
+        # print("Incoming data shape:", data.shape)
         print("Incoming data:", data)
 
         prediction = model.predict(data)
@@ -45,20 +45,6 @@ def predict():
         return jsonify({'prediction': predicted_character})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-    # Print the features and predictions for analysis
-    print("Incoming data shape:", data.shape)
-    print("Incoming data:", data)
-    print("Model prediction:", prediction)
-
-    # Visualize feature importance (if using RandomForest)
-    importances = model.feature_importances_
-    indices = np.argsort(importances)[::-1]
-
-    # Print the feature ranking
-    print("Feature ranking:")
-    for f in range(data.shape[1]):
-        print(f"{f + 1}. feature {indices[f]} ({importances[indices[f]]})")
 
 
 if __name__ == '__main__':
