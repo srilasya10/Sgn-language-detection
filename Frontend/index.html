@@ -3,19 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Language Recognition</title>
+    <title>Hand Landmark Detection using MediaPipe</title>
+    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- TensorFlow.js Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Sign Language Recognition</h1>
-        <video id="video" width="640" height="480" autoplay></video>
-        <button id="start-btn">Start Predicting</button>
-        <p id="prediction">Prediction: <span id="predicted-character">-</span></p>
+    <header>
+        <h3>Hand Landmark Detection using MediaPipe</h3>
+    </header>
+
+    <section id="demos">
+        <div id="liveView" class="videoView">
+            <div class="image-container-left">
+                <figure>
+                    <img src="{{ url_for('static', filename='sign_lang_B.jpg') }}" alt="Sign for B">
+                    <figcaption>B</figcaption>
+                </figure>
+                <figure>
+                    <img src="{{ url_for('static', filename='sign_lang_C.png') }}" alt="Sign for C">
+                    <figcaption>C</figcaption>
+                </figure>
+            </div>
+
+            <div id="videoContainer">
+                <video id="webcam" autoplay playsinline></video>
+                <canvas class="output_canvas" id="output_canvas"></canvas>
+            </div>
+
+            <div class="image-container-right">
+                <figure>
+                    <img src="{{ url_for('static', filename='sign_lang_L.png') }}" alt="Sign for L">
+                    <figcaption>L</figcaption>
+                </figure>
+                <figure>
+                    <img src="{{ url_for('static', filename='sign_lang_Y.jpg') }}" alt="Sign for Y">
+                    <figcaption>Y</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- Add the button to enable the webcam -->
+        <button id="webcamButton" class="mdc-button">
+            <span class="mdc-button__label">ENABLE WEBCAM</span>
+        </button>
+    </section>
+
+    <!-- Added div to display the prediction -->
+    <div id="prediction-container">
+        <h3>Prediction Output:</h3>
+        <p id="prediction">None</p> <!-- This will update with the prediction result -->
     </div>
+
+    <footer>
+        <p>Hand detection by MediaPipe & Flask API</p>
+    </footer>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
