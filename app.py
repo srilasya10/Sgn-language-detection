@@ -3,6 +3,7 @@ import pickle
 import numpy as np
 import os
 
+
 app = Flask(__name__, template_folder='frontend')  # Set the custom template folder
 
 # Load the pickled model
