@@ -43,6 +43,7 @@ def predict():
         print("Model prediction:", prediction)
 
         predicted_character = labels_dict[int(prediction[0])]
+        print("Predicted character:", predicted_character)
         return jsonify({'prediction': predicted_character})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
