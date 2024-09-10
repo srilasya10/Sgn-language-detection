@@ -1,5 +1,10 @@
+
+// import Swal from 'sweetalert2'
+
+
 const demosSection = document.getElementById("demos");
 const enableWebcamButton = document.getElementById("webcamButton");
+const endButton = document.getElementById("endButton");
 let webcamRunning = false;
 
 const videoElement = document.getElementById("webcam");
@@ -11,8 +16,10 @@ countdownElement.id = "countdown";
 demosSection.appendChild(countdownElement);
 
 let pred_array = [];
-let countdown = 15;
+let countdown = 7;
 let timer;
+let lastPrediction = ''; // Variable to store the last prediction
+let handDetected = false; // New flag to check if a hand is detected
 
 // Initialize MediaPipe Hands
 const hands = new Hands({
@@ -33,7 +40,10 @@ async function onResults(results) {
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
-    if (results.multiHandLandmarks) {
+    // Check if hand landmarks are detected
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        handDetected = true; // Set handDetected to true when a hand is detected
+
         for (const landmarks of results.multiHandLandmarks) {
             // Draw hand landmarks on canvas for visualization
             drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: "#00FF00", lineWidth: 5 });
@@ -50,9 +60,9 @@ async function onResults(results) {
             // Normalize the landmarks
             const normalizedLandmarks = landmarks.flatMap(({ x, y }) => [(x - minX), (y - minY)]);
 
-            try {
-                // Send normalized landmarks to backend for prediction only after countdown is 0
-                if (countdown === 0) {
+            // If countdown is zero, make prediction
+            if (countdown === 0) {
+                try {
                     const response = await fetch('/predict', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -61,25 +71,36 @@ async function onResults(results) {
 
                     // Get prediction from backend and display
                     const data = await response.json();
-                    pred_array.push(data.prediction);
-                    predictionElement.innerText = pred_array.join(' ') || "No prediction";
+                    lastPrediction = data.prediction || ''; // Store the latest prediction
 
+                    if (lastPrediction) {
+                        pred_array.push(lastPrediction);
+                        predictionElement.innerText = pred_array.join('') || "No prediction";
+                    }
                     resetTimer(); // Reset the timer after a successful prediction
+                } catch (error) {
+                    console.error("Error during fetch:", error);
+                    predictionElement.innerText = "Error in prediction";
                 }
-            } catch (error) {
-                console.error("Error during fetch:", error);
-                predictionElement.innerText = "Error in prediction";
             }
         }
     } else {
-        predictionElement.innerText = "No hand detected";
+        handDetected = false; // No hand detected
+    }
+
+    // If no hand is detected and countdown reaches 0, insert 'XXX' and reset the timer
+    if (!handDetected && countdown === 0) {
+        pred_array.push(' '); // Add 'XXX' to predictions array
+        predictionElement.innerText = pred_array.join(''); // Update display with space
+        resetTimer(); // Reset the timer
     }
 
     canvasCtx.restore();
 }
 
 function resetTimer() {
-    countdown = 15; // Reset countdown to 15 seconds
+    countdown = 7; // Reset countdown to 7 seconds
+    lastPrediction = ''; // Clear the last prediction
 }
 
 function startTimer() {
@@ -93,9 +114,12 @@ function startTimer() {
             countdownElement.innerText = ''; // Clear the countdown display when more than 5 seconds left
         }
 
-        if (countdown === 0) {
-            countdownElement.innerText = ''; // Clear countdown display
-            // Do NOT reset the timer here; wait until a prediction is received
+        // Check if countdown is zero
+        if (countdown === 0 && !handDetected) {
+            // If no hand detected, insert 'XXX' and reset the timer
+            pred_array.push(' ');
+            predictionElement.innerText = pred_array.join(''); // Update display
+            resetTimer(); // Reset the timer
         }
     }, 1000); // Update every second
 }
@@ -145,3 +169,52 @@ function startDetection() {
 
     processVideoFrame();
 }
+
+// Handle "End" button click: clear pred_array and display the sentence in an alert
+endButton.addEventListener("click", () => {
+    const sentence = pred_array.join('').trim(); // Join the predictions into a sentence
+    if (sentence) {
+        Swal.fire({
+            title: "Your sentence is",
+            text: sentence,
+            icon: "success",
+            confirmButtonText: "OK"
+        }).then(() => {
+            // Reset everything when "OK" is clicked
+            resetApp();
+        });
+    }
+});
+
+// Function to reset the app
+// Function to reset the app
+function resetApp() {
+    pred_array = []; // Clear the array
+    predictionElement.innerText = "None"; // Reset the display
+
+    // Disable webcam if running
+    if (webcamRunning) {
+        webcamRunning = false;
+        enableWebcamButton.querySelector('.mdc-button__label').innerText = "ENABLE WEBCAM";
+        const stream = videoElement.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach((track) => track.stop()); // Stop the webcam
+        videoElement.srcObject = null; // Clear the video element source
+        clearInterval(timer); // Stop the timer
+    }
+
+    // Reset countdown and clear the countdown display
+    countdown = 7;
+    countdownElement.innerText = '';
+
+    // Hide the video element
+    videoElement.style.display = 'none';
+
+    // Change container color to blue
+    demosSection.style.backgroundColor = 'blue'; // or any other color code you want
+
+    // Optionally, reload the page to completely reset the state
+    location.reload();
+}
+
+

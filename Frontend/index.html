@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -45,9 +46,14 @@
             </div>
         </div>
 
-        <!-- Add the button to enable the webcam -->
+        <!-- Button to enable the webcam -->
         <button id="webcamButton" class="mdc-button">
             <span class="mdc-button__label">ENABLE WEBCAM</span>
+        </button>
+
+        <!-- Added the end button here -->
+        <button id="endButton" class="mdc-button">
+            <span class="mdc-button__label">END</span>
         </button>
     </section>
 
