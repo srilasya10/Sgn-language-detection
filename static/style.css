@@ -149,3 +149,22 @@ footer p {
 #webcamButton:hover {
     background-color: #6dd5ed;
 }
+
+#endButton {
+    display: block;
+    margin: 20px auto; /* This will center the button */
+    background-color: #ff4d4d; /* Nice red color */
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+}
+
+#endButton:hover {
+    background-color: #ff6666; /* Slightly lighter red on hover */
+}
