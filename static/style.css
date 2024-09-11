@@ -168,3 +168,29 @@ footer p {
 #endButton:hover {
     background-color: #ff6666; /* Slightly lighter red on hover */
 }
+
+.swal-title {
+    font-family: 'Arial', sans-serif;
+    font-size: 24px;
+    color: #333;
+}
+
+.swal-content {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    color: #555;
+    text-align: left;
+}
+
+.swal-confirm-button {
+    background-color: #1E90FF !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 10px 20px !important;
+    font-size: 16px !important;
+}
+
+.swal-confirm-button:hover {
+    background-color: #1C86EE !important;
+}

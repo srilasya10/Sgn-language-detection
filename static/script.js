@@ -35,6 +35,36 @@ hands.setOptions({
 
 hands.onResults(onResults);
 
+Swal.fire({
+    title: "Welcome to Sign Language Prediction",
+    html: `
+        <p>This app predicts sign language gestures using <strong>MediaPipe Hands</strong>.</p>
+        <p>Please enable your webcam to start.</p>
+        <p>The app will predict sign language gestures every <strong>7 seconds</strong>.</p>
+        <p>Click <strong>'End'</strong> to finish and see your sentence.</p>
+        <p>If no hand is detected, a <strong>space</strong> between words will be added.</p>
+        <p>
+            <a href="https://www.researchgate.net/figure/The-26-letters-and-10-digits-of-American-Sign-Language-ASL_fig1_328396430" 
+               id="info" 
+               style="color: #1E90FF; text-decoration: none;" 
+               target="_blank">
+               See Letters in Sign Language
+            </a>
+        </p>
+    `,
+    icon: "info",
+    confirmButtonText: "OK",
+    background: '#f0f8ff', // Light background color
+    width: '600px', // Adjust the width as needed
+    padding: '20px',
+    customClass: {
+        title: 'swal-title',
+        content: 'swal-content',
+        confirmButton: 'swal-confirm-button'
+    }
+});
+
+
 async function onResults(results) {
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
