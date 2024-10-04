@@ -16,7 +16,7 @@ countdownElement.id = "countdown";
 demosSection.appendChild(countdownElement);
 
 let pred_array = [];
-let countdown = 7;
+let countdown = 3;
 let timer;
 let lastPrediction = ''; // Variable to store the last prediction
 let handDetected = false; // New flag to check if a hand is detected
@@ -40,7 +40,7 @@ Swal.fire({
     html: `
         <p>This app predicts sign language gestures using <strong>MediaPipe Hands</strong>.</p>
         <p>Please enable your webcam to start.</p>
-        <p>The app will predict sign language gestures every <strong>7 seconds</strong>.</p>
+        <p>The app will predict sign language gestures every <strong>3 seconds</strong>.</p>
         <p>Click <strong>'End'</strong> to finish and see your sentence.</p>
         <p>If no hand is detected, a <strong>space</strong> between words will be added.</p>
         <p>
@@ -129,7 +129,7 @@ async function onResults(results) {
 }
 
 function resetTimer() {
-    countdown = 7; // Reset countdown to 7 seconds
+    countdown = 3; // Reset countdown to 3 seconds
     lastPrediction = ''; // Clear the last prediction
 }
 
@@ -234,7 +234,7 @@ function resetApp() {
     }
 
     // Reset countdown and clear the countdown display
-    countdown = 7;
+    countdown = 3;
     countdownElement.innerText = '';
 
     // Hide the video element
