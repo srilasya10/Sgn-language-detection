@@ -35,15 +35,15 @@ def predict():
 
         # Log the incoming data for debugging
         # print("Incoming data shape:", data.shape)
-        print("Incoming data:", data)
+        # print("Incoming data:", data)
 
         prediction = model.predict(data)
 
         # Log the prediction result for debugging
-        print("Model prediction:", prediction)
+        # print("Model prediction:", prediction)
 
         predicted_character = labels_dict[int(prediction[0])]
-        print("Predicted character:", predicted_character)
+        # print("Predicted character:", predicted_character)
         return jsonify({'prediction': predicted_character})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
