@@ -51,6 +51,7 @@ Swal.fire({
                See Letters in Sign Language
             </a>
         </p>
+        <p><strong>&copy; Bhaskar, L.K.Sai, Lasya, Manoj<strong></p>
     `,
     icon: "info",
     confirmButtonText: "OK",
